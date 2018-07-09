@@ -1,42 +1,66 @@
-import React from 'react';
-import cx from 'classnames';
+import React from "react";
+import cx from "classnames";
 
-const countries = ['Belgium', 'France', 'Germany', 'Holland', 'Ireland', 'Italy', 'Luxemburg', 'Portugal', 'Spain'];
+const countries = [
+  "Belgium",
+  "France",
+  "Germany",
+  "Holland",
+  "Ireland",
+  "Italy",
+  "Luxemburg",
+  "Portugal",
+  "Spain"
+];
 
-function CountrySelector({ countryListOpen, selectedCountry, dispatch}){
-
-  function selectCountry(country){
+function CountrySelector({
+  countryListOpen,
+  selectedCountry,
+  deletedCountry,
+  dispatch
+}) {
+  function selectCountry(country) {
     dispatch({
-      type: 'SET_SELECTED_COUNTRY',
+      type: "SET_SELECTED_COUNTRY",
       selectedCountry: country
     });
 
     dispatch({
-      type: 'SET_COUNTRY_LIST_OPEN',
+      type: "SET_COUNTRY_LIST_OPEN",
       countryListOpen: false
     });
   }
 
-  function handleFocus(event){
+  function handleFocus(event) {
     dispatch({
-      type: 'SET_COUNTRY_LIST_OPEN',
+      type: "SET_COUNTRY_LIST_OPEN",
       countryListOpen: true
     });
   }
 
-  function handleBlur(event){
+  function handleBlur(event) {
     dispatch({
-      type: 'SET_COUNTRY_LIST_OPEN',
+      type: "SET_COUNTRY_LIST_OPEN",
       countryListOpen: false
     });
   }
 
-  const listClasses = cx('country-input__list',  {
-    'country-input__list--visible': countryListOpen
+  function submitHandler(event) {
+    event.preventDefault();
+    selectedCountry
+      ? dispatch({
+          type: "ADD_COUNTRY",
+          country: selectedCountry
+        })
+      : alert("Please select a country.");
+  }
+
+  const listClasses = cx("country-input__list", {
+    "country-input__list--visible": countryListOpen
   });
 
   return (
-    <div className="country-input">
+    <form onSubmit={submitHandler} className="country-input">
       <input
         type="text"
         className="country-input__field"
@@ -44,14 +68,23 @@ function CountrySelector({ countryListOpen, selectedCountry, dispatch}){
         onFocus={handleFocus}
         onBlur={handleBlur}
       />
+      <button type="submit" />
       <div className={listClasses}>
         <ul>
-          {countries.map( country => {
-            return <li key={country} onMouseDown={() => selectCountry(country)}>{country}</li>
-          })}
+          {countries
+            .filter(country => {
+              return country != deletedCountry;
+            })
+            .map(country => {
+              return (
+                <li key={country} onMouseDown={() => selectCountry(country)}>
+                  {country}
+                </li>
+              );
+            })}
         </ul>
       </div>
-    </div>
+    </form>
   );
 }
 
